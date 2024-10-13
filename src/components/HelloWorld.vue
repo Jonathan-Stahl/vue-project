@@ -13,7 +13,7 @@ export default {
   methods: {
     fetchData() {
       // use a piece of dynamic data to modify the API call
-      let query = 'https://api.collection.nfsa.gov.au/search?query=lobby-card'
+      let query = 'https://api.collection.nfsa.gov.au/search?query=lobby%20card&hasMedia=yes'
       console.log(query)
       fetch(query)
         .then((response) => {
@@ -29,23 +29,33 @@ export default {
 </script>
 
 <template>
-  <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
-    <button @click="fetchData">Click Me!</button>
-  </div>
-  <SearchBar />
-  <ul class="list-v">
-    <!-- create a variable called result, 
+  <div class="flex">
+    <div class="greetings">
+      <h1 class="green">{{ msg }}</h1>
+      <button @click="fetchData">Click Me!</button>
+      <SearchBar />
+    </div>
+
+    <div>
+      <ul class="list-v">
+        <!-- create a variable called result, 
       loop through the API results and add a <li> for each result.
       Use the result variable to access properties like 'title' and 'name' -->
-    <li v-for="result in theData.results" :key="result.title">
-      {{ result.title }}
-      {{ result.name }}
-    </li>
-  </ul>
+        <li v-for="result in theData.results" :key="result.title">
+          {{ result.title }}
+          {{ result.name }}
+          {{ result.preview.filePath }}
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.flex {
+  display: flex;
+  flex-wrap: row;
+}
 h1 {
   font-weight: 500;
   font-size: 2.6rem;
