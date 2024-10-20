@@ -4,6 +4,6 @@ import HelloWorld from '@/components/HelloWorld.vue'
 
 <template>
   <main>
-    <HelloWorld msg="Search by" />
+    <HelloWorld msg="Search NFSA's Lobby Card Collection" />
   </main>
 </template>

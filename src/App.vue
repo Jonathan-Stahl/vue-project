@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-// import SearchBar from './components/SearchBar.vue'
+import RandomCard from './components/RandomCard.vue'
 </script>
 
 <template>
+  <RandomCard />
   <RouterView />
 </template>
 
