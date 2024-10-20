@@ -3,14 +3,16 @@
     <h1>{{ msg }}</h1>
 
     <div class="search-bar-container">
-      <!-- Search Input Field -->
       <input v-model="searchString" placeholder="Search..." class="search-input" />
-
-      <!-- Search Button -->
-      <button class="search-button" @click="fetchData">Search</button>
+      <button class="search-button" @click="resetAndFetchData">Search</button>
     </div>
 
-    <!-- Sorting Buttons -->
+    <div class="search-buttons">
+      <button @click="setDateFilter('1910-1950')">1910-1950</button>
+      <button @click="setDateFilter('1951-1990')">1951-1990</button>
+      <button @click="setDateFilter('all')">All</button>
+    </div>
+
     <div class="sorting-buttons">
       <button class="color-button red" @click="sortByColor('red')">Red</button>
       <button class="color-button green" @click="sortByColor('green')">Green</button>
@@ -21,12 +23,20 @@
       <button class="color-button all" @click="sortByColor('all')">Show All</button>
     </div>
 
-    <!-- Displaying Total Results -->
     <p>Total: {{ total }}</p>
 
-    <!-- Gallery for Results -->
+    <p v-if="searchString && items.length === 0">
+      No results under this search: "{{ searchString }}"
+    </p>
+
     <div id="gallery">
-      <div v-for="item in items" :key="item.id" class="card-container" :class="item.color">
+      <div
+        v-for="(item, index) in items"
+        :key="`${item.id}-${index}`"
+        class="card-container"
+        :class="item.color"
+        @click="openPopup(item)"
+      >
         <h3>{{ item.title || 'No Title' }}</h3>
         <p>{{ item.name || 'No Name' }}</p>
         <div class="imgContainer">
@@ -35,8 +45,47 @@
       </div>
     </div>
 
-    <!-- No results message -->
-    <p v-if="total === 0">Sorry, there are no results under this search query.</p>
+    <p v-if="total === 0 && searchString.length === 0">
+      Sorry, there are no results under this search query.
+    </p>
+
+    <div v-if="popupVisible" class="popup">
+      <div class="popup-content">
+        <button class="close-button" @click="closePopup">&times;</button>
+        <h3>{{ selectedItem.title || 'No Title' }}</h3>
+        <div class="imgPopup">
+          <img :src="selectedItem.imgurl" alt="Image not available" />
+        </div>
+        <p>
+          Date:
+          {{
+            selectedItem.productionDates && selectedItem.productionDates.length > 0
+              ? selectedItem.productionDates[0].fromYear
+              : 'Unknown'
+          }}
+        </p>
+        <p>Description: {{ selectedItem.name || 'No description' }}</p>
+        <p>Summary: {{ selectedItem.summary || 'No summary' }}</p>
+        <p>
+          Country:
+          {{
+            selectedItem.countries && selectedItem.countries.length > 0
+              ? selectedItem.countries[0]
+              : 'Unknown'
+          }}
+        </p>
+        <p>
+          Genre:
+          {{
+            selectedItem.parentTitle &&
+            selectedItem.parentTitle.genres &&
+            selectedItem.parentTitle.genres.length > 0
+              ? selectedItem.parentTitle.genres[0]
+              : 'Unknown'
+          }}
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -50,79 +99,191 @@ export default {
   },
   data() {
     return {
-      searchString: '', // Bound to search input
-      total: 0, // Total search results
-      items: [], // Gallery items after search
+      searchString: '',
+      total: 0,
+      items: [],
       query: 'https://api.collection.nfsa.gov.au/search?limit=25&forms=Lobby%20card&hasMedia=yes',
-      imgURL: 'https://media.nfsacollection.net/', // Base URL for images
-      originalItems: [], // Original items for filtering
-      currentPage: 1, // Track the current page for pagination
-      tempData: {}, // Temporary data to hold results during pagination
-      tempResultSet: [] // Temporary array to hold results
+      imgURL: 'https://media.nfsacollection.net/',
+      currentPage: 1,
+      originalItems: [],
+      isLoading: false,
+      dateFilter: '',
+      colorFilter: '',
+      popupVisible: false,
+      selectedItem: {} // To store the details of the clicked item
     }
   },
-
   methods: {
     fetchData() {
-      let queryString = `${this.query}&query=${this.searchString}&page=${this.currentPage}`
-      fetch(queryString)
+      this.isLoading = true
+
+      let url = `${this.query}&query=${this.searchString}&page=${this.currentPage}`
+
+      if (this.dateFilter && this.dateFilter !== 'all') {
+        url += `&year=${this.dateFilter}`
+      }
+
+      fetch(url)
         .then((response) => {
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
           return response.json()
         })
         .then((res) => {
-          this.tempData = { ...this.tempData, ...res } // Merge with temporary data
-          this.tempResultSet = this.tempResultSet.concat(res.results) // Concatenate results
-          this.total = res.meta.count.total // Update total results
+          this.total = res.meta.count.total // Set total based on response
 
-          if (this.total > 0) {
-            if (this.currentPage * 25 < 500 && this.currentPage * 25 < this.total) {
-              this.currentPage++ // Increment page number
-              this.fetchData() // Fetch next page
-            } else {
-              this.items = this.tempResultSet.map((item) => {
-                const imgurl = item.preview?.find((preview) => preview.filePath)?.filePath
-                return {
-                  id: item.id, // Ensure there's an ID for keys
-                  title: item.title || 'No Title',
-                  name: item.name || 'No Name',
-                  imgurl: imgurl ? `${this.imgURL}${imgurl}` : '',
-                  color: this.assignRandomColor() // Assign random color for sorting/filtering
-                }
-              })
-              this.originalItems = [...this.items] // Store original items for filtering
-              // Reset temp variables
-              this.tempData = {}
-              this.tempResultSet = []
-              this.currentPage = 1 // Reset current page after fetching all data
+          const newItems = res.results.map((item) => {
+            const imgurl = item.preview?.find((preview) => preview.filePath)?.filePath
+            return {
+              id: item.id,
+              title: item.title || 'No Title',
+              name: item.name || 'No Name',
+              imgurl: imgurl ? `${this.imgURL}${imgurl}` : '',
+              countries: item.countries || 'Unknown', // Example property
+              productionDates: item.productionDates || 'Unknown', // Example property
+              summary: item.summary || 'No Summary',
+              description: item.description || 'No Description', // Example property
+              authors: item.authors || 'Unknown', // Example property
+              parentTitle: item.parentTitle || 'Unknown',
+              color: this.assignRandomColor()
             }
+          })
+
+          // Adjust total if no new items are found
+          if (newItems.length === 0) {
+            this.total = 0
           } else {
-            console.log('no results')
+            const existingIds = new Set(this.items.map((item) => item.id))
+            const uniqueNewItems = newItems.filter((item) => !existingIds.has(item.id))
+
+            this.items.push(...uniqueNewItems)
+            this.originalItems.push(...uniqueNewItems)
+            this.currentPage++
           }
+
+          this.isLoading = false
         })
         .catch((err) => {
           console.error(err)
+          this.isLoading = false
         })
     },
+    loadMore() {
+      const windowHeight = window.innerHeight
+      const documentHeight = document.documentElement.scrollHeight
+      const scrollY = window.scrollY
 
+      if (
+        scrollY + windowHeight >= documentHeight - 100 &&
+        !this.isLoading &&
+        this.currentPage * 25 < this.total
+      ) {
+        this.fetchData()
+      }
+    },
     assignRandomColor() {
       const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange']
       return colors[Math.floor(Math.random() * colors.length)]
     },
-
     sortByColor(color) {
+      this.colorFilter = color
+      this.currentPage = 1
       if (color === 'all') {
-        this.items = [...this.originalItems] // Show all items
+        this.items = [...this.originalItems]
       } else {
         this.items = this.originalItems.filter((item) => item.color === color)
       }
+    },
+    setDateFilter(year) {
+      this.dateFilter = year
+      this.currentPage = 1
+      this.items = []
+      this.fetchData()
+    },
+    resetAndFetchData() {
+      this.currentPage = 1
+      this.items = []
+      this.fetchData()
+    },
+    openPopup(item) {
+      this.selectedItem = item // Store the selected item details
+      this.popupVisible = true // Show the popup
+    },
+    closePopup() {
+      this.popupVisible = false // Hide the popup
+      this.selectedItem = {} // Clear the selected item
     }
+  },
+  mounted() {
+    this.fetchData()
+    window.addEventListener('scroll', this.loadMore)
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.loadMore)
   }
 }
 </script>
 
 <style scoped>
-/* Similar styles for gallery and search list */
+/* Add your existing styles here */
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  font-size: 0.9em;
+  top: 2em;
+  color: #777d87;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.popup-content h3 {
+  color: #1f2937;
+  font-weight: 900;
+}
+
+.close-button {
+  color: #1f2937;
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 40px;
+  cursor: pointer;
+}
+
+.imgPopup {
+  object-fit: cover;
+}
+
+.imgPopup img {
+  border-radius: 0%;
+  width: 100%;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.close-button:hover {
+  rotate: 90deg;
+  transition-duration: 0.5s;
+}
+
 body {
   font-family: 'Arial', sans-serif;
   background-color: #f3f4f6;
@@ -166,6 +327,14 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
+.search-buttons {
+  height: 4em;
+  display: flex;
+  position: relative;
+  color: #1f2937;
+  gap: 10px;
+}
+
 .search-button:hover {
   background-color: #1f2937;
 }
@@ -181,6 +350,7 @@ body {
 }
 
 .color-button {
+  font-size: 0.9em;
   width: 60px; /* Set a width for the buttons */
   padding: 10px; /* Padding for buttons */
   color: white; /* Text color for all buttons */
@@ -252,6 +422,7 @@ body {
   font-size: 1.2em;
   color: #1f2937;
   margin: 10px 0;
+  font-weight: 800;
 }
 
 .card-container p {
@@ -267,10 +438,7 @@ body {
   border-radius: 10px;
 }
 
-.imgContainer:hover img {
-  transform: scale(1.1);
-}
-
+/* Border colors for card containers */
 .red {
   border-left: 5px solid rgb(183, 45, 45);
   border-bottom: 5px solid rgb(183, 45, 45);
@@ -299,5 +467,23 @@ body {
 h1 {
   color: #f3f4f6;
   margin-top: 15px;
+}
+
+@media (max-width: 1024px) {
+  .sorting-buttons {
+    position: relative; /* Make it fixed */
+    display: flex;
+    flex-direction: row; /* Stack buttons vertically */
+    margin-top: 3em;
+    flex-wrap: wrap;
+  }
+  .color-button {
+    height: 2em;
+  }
+  .search-buttons {
+    height: 2em;
+    left: 10px;
+    top: 10px;
+  }
 }
 </style>
