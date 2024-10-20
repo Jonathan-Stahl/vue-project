@@ -1,10 +1,10 @@
 # My Vue Project
 
-The website I made is a seamless search engine designed for the Nationa Film Sound Archive's lobby card collection. Some of it's centric features include, an accurate search query bar to pull results, a colour sorter which sorts the images based on it's allocated colour, date filters, and a random lobby card generator. When a user hops onto this website, they are encouraged to activate the random lobby card generator, explore the NFSA lobby card collection, and aesthetically sort the lobby cards into their respective colours. The lobby cards themselves are displayed in card-like views within a gallery, showcasing the name and description of the lobby card. If a lobby card piques one's interest, they may click on a card which brings up a popup window with the image in a larger view, with extra details listed below it including the date published, country, summary, and genre. Overall this website encompasses the NFSA's collection in a structured and unique way. It encourages users to spend a few minutes of their time exploring a vast gallery, and hopefully encourage designers, like myself, in utilising the colour sorter feature to identify similarities and coherance in the lobby card collection.
+The website I made is a seamless search engine designed for the National Film Sound Archive's lobby card collection. Some of it's centric features include, an accurate search query bar to pull results, a colour sorter which sorts the images based on it's allocated colour, date filters, and a random lobby card generator. When a user hops onto this website, they are encouraged to activate the random lobby card generator, explore the NFSA lobby card collection, and aesthetically sort the lobby cards into their respective colours. The lobby cards themselves are displayed in card-like views within a gallery, showcasing the name and description of the lobby card. If a lobby card piques one's interest, they may click on a card which brings up a popup window with the image in a larger view, with extra details listed below it including the date published, country, summary, and genre. Overall this website encompasses the NFSA's collection in a structured and unique way. It encourages users to spend a few minutes of their time exploring a vast gallery, and hopefully encourage designers, like myself, in utilising the colour sorter feature to identify similarities and coherance in the lobby card collection.
 
 # Development Process
 
-Overall, my progress through this project has been on a roller coaster. Due to commitments outside of uni, I was unable to work on this project on extended periods of time. Also, starting off with an ambitious prototype to introduce a colour sorter in my website was something I didn't think too much of. I firstly progressed through the learning modules so that I can get a better understanding of how APIs and Vue work. It did take awhile learning the basics, but once I started, I was pretty much on a roll.
+Overall, my progress through this project has been on a roller coaster. Due to commitments outside of uni, I was unable to work on this project on extended periods of time. Also, starting off with an ambitious prototype to introduce a colour sorter in my website was something I didn't think too much of. I firstly progressed through the learning modules so that I can get a better understanding of how APIs and Vue work, and practised API things in random mockup websites. It did take awhile learning the basics, but once I started, I was pretty much on a roll.
 
 When introducing the API into my website, I managed to bring up the title, name, and images of a lobby card and display the results in a flex grid on my website after a button was clicked. I then attempted to introduce a colour sorter, which did not go so well. After having some proxy issues, I was unable to install ColorThief which I believe would have been a great asset in my website. After multiple attempts, I had to resort to a 'mockup' version of a colour sorter. So, with the help of AI, introduced a random colour assignment to each card, which were able to be sorted by the colour buttons. Although, much less cool, it still had the vision of what I had intended.
 
@@ -18,17 +18,21 @@ Overall, I think I have made a solid effort at this project. I believe I spent a
 
 # References
 
-ColorThief. (2024). colorthief https://www.npmjs.com/package/colorthief
-an attempt and a wishful desire to have this happen on my website but unfortunately unable due to proxy issues
+- ColorThief. (2024). colorthief https://www.npmjs.com/package/colorthief
 
-National Film and Sound Archive of Australia. (2024). The collection. https://www.nfsa.gov.au/collection
-the foundation of my website's collection
+  - an attempt and a wishful desire to have this happen on my website but unfortunately unable due to proxy issues
 
-OpenAI. (2024, October 21). Response from ChatGPT [Large language model]. Personal communication.
-often used as a debugger, time saver and tutor for my coding journey
+- National Film and Sound Archive of Australia. (2024). The collection. https://www.nfsa.gov.au/collection
 
-W3Schools. (2024). W3Schools online web tutorials. W3Schools. https://www.w3schools.com/
-used to revisit random css values
+  - the foundation of my website's collection
 
-StackOverflow. (2017). Could not find a declaration file for module 'module-name'. '/path/to/module-name.js' implicitly has an 'any' type. https://stackoverflow.com/questions/41292559/could-not-find-a-declaration-file-for-module-module-name-path-to-module-nam
-stack overflow has good debugging for overall issues, one simple line of code from a random user could fix my entire website!
+- OpenAI. (2024, October 21). Response from ChatGPT [Large language model]. Personal communication.
+
+  - often used as a debugger, time saver and tutor for my coding journey
+
+- W3Schools. (2024). W3Schools online web tutorials. W3Schools. https://www.w3schools.com/
+
+  - used to revisit random css values
+
+- StackOverflow. (2017). Could not find a declaration file for module 'module-name'. '/path/to/module-name.js' implicitly has an 'any' type. https://stackoverflow.com/questions/41292559/could-not-find-a-declaration-file-for-module-module-name-path-to-module-nam
+  - stack overflow has good debugging for overall issues, one simple line of code from a random user could fix my entire website!
