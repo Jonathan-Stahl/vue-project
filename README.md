@@ -1,5 +1,7 @@
 # My Vue Project
 
+[Link to the working website](https://jonathan-stahl.github.io/vue-project/)
+
 The website I made is a seamless search engine designed for the National Film Sound Archive's lobby card collection. Some of it's centric features include, an accurate search query bar to pull results, a colour sorter which sorts the images based on it's allocated colour, date filters, and a random lobby card generator. When a user hops onto this website, they are encouraged to activate the random lobby card generator, explore the NFSA lobby card collection, and aesthetically sort the lobby cards into their respective colours. The lobby cards themselves are displayed in card-like views within a gallery, showcasing the name and description of the lobby card. If a lobby card piques one's interest, they may click on a card which brings up a popup window with the image in a larger view, with extra details listed below it including the date published, country, summary, and genre. Overall this website encompasses the NFSA's collection in a structured and unique way. It encourages users to spend a few minutes of their time exploring a vast gallery, and hopefully encourage designers, like myself, in utilising the colour sorter feature to identify similarities and coherance in the lobby card collection.
 
 # Development Process
